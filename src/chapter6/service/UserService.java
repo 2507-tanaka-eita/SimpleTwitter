@@ -134,9 +134,8 @@ public class UserService {
 			// 実践課題① -----
 			// passwordが空白でない場合のみ暗号化の処理
 			String password = user.getPassword();
-			if (!StringUtils.isEmpty(password)) {
+			if (!StringUtils.isBlank(password)) {
 				// パスワード暗号化
-				// String encPassword = CipherUtil.encrypt(user.getPassword());
 				String encPassword = CipherUtil.encrypt(password);
 				user.setPassword(encPassword);
 			}
