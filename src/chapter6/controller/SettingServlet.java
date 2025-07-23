@@ -69,12 +69,11 @@ public class SettingServlet extends HttpServlet {
 
 		User user = getUser(request);
 		// 実践問題③ -----
-		// アカウント名の重複チェック
+		// アカウント名の重複チェック　＊自身のアカウント名との重複は無視するようにid判定も追加
 		String account = user.getAccount();
-		String accountCheck = new UserService().select(account).toString();
-
-		if (account.equals(accountCheck)) {
-			request.setAttribute("errorMessages", "アカウント名が重複しています");
+		User accountCheck = new UserService().select(account);
+		if (accountCheck != null && accountCheck.getId() != user.getId()) {
+			request.setAttribute("errorMessages", "すでに存在するアカウントです");
 			request.setAttribute("user", user);
 			request.getRequestDispatcher("setting.jsp").forward(request, response);
 			return;

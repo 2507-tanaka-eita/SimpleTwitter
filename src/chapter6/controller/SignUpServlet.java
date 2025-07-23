@@ -60,11 +60,15 @@ public class SignUpServlet extends HttpServlet {
 
 		User user = getUser(request);
 		// 実践問題③ -----
-		// 例外(アカウント名の重複)があった場合はエラーメッセージを返す
-		try {
-			String account = user.getAccount();
-			new UserService().select(account);
-
+		// アカウント名の重複チェック　＊自身のアカウント名との重複は無視するようにid判定も追加
+		String account = user.getAccount();
+		User accountCheck = new UserService().select(account);
+		if (accountCheck != null && accountCheck.getId() != user.getId()) {
+			request.setAttribute("errorMessages", "すでに存在するアカウントです");
+			request.setAttribute("user", user);
+			request.getRequestDispatcher("signup.jsp").forward(request, response);
+			return;
+		} else {
 			if (!isValid(user, errorMessages)) {
 				request.setAttribute("errorMessages", errorMessages);
 				request.getRequestDispatcher("signup.jsp").forward(request, response);
@@ -72,11 +76,6 @@ public class SignUpServlet extends HttpServlet {
 			}
 			new UserService().insert(user);
 			response.sendRedirect("./");
-		} catch (IllegalStateException e) {
-			request.setAttribute("errorMessages", e.getMessage());
-		    request.setAttribute("user", user);
-		    request.getRequestDispatcher("signup.jsp").forward(request, response);
-		    return;
 		}
 	}
 
