@@ -32,7 +32,8 @@ public class UserMessageDao {
 
 	}
 
-	public List<UserMessage> select(Connection connection, int num) {
+	// 引数に"id"を追加。nullが扱えるようにラッパークラス(Integer)で型指定。
+	public List<UserMessage> select(Connection connection, Integer id, int num) {
 
 		log.info(new Object() {
 		}.getClass().getEnclosingClass().getName() +
@@ -41,6 +42,11 @@ public class UserMessageDao {
 
 		PreparedStatement ps = null;
 		try {
+			/*
+			* 実践問題② -----
+			* idがnullだったら全件取得する
+			* idがnull以外だったら、その値に対応するユーザーIDの投稿を取得する
+			*/
 			StringBuilder sql = new StringBuilder();
 			sql.append("SELECT ");
 			sql.append("    messages.id as id, ");
@@ -52,9 +58,15 @@ public class UserMessageDao {
 			sql.append("FROM messages ");
 			sql.append("INNER JOIN users ");
 			sql.append("ON messages.user_id = users.id ");
+			if (id != null) {
+				sql.append("WHERE messages.user_id = ? ");
+			}
 			sql.append("ORDER BY created_date DESC limit " + num);
 
 			ps = connection.prepareStatement(sql.toString());
+			if (id != null) {
+				ps.setInt(1, id);
+			}
 
 			ResultSet rs = ps.executeQuery();
 
