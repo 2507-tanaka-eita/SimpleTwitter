@@ -122,6 +122,30 @@ public class UserService {
 		}
 	}
 
+	/*
+	 * 実践問題③ -----
+	 * String型の引数をもつ、selectメソッドを追加する
+	 */
+	public User select(String account) {
+
+	    Connection connection = null;
+	    try {
+	        connection = getConnection();
+	        User user = new UserDao().select(connection, account);
+	        commit(connection);
+
+	        return user;
+	    } catch (RuntimeException e) {
+	        rollback(connection);
+	        throw e;
+	    } catch (Error e) {
+	        rollback(connection);
+	        throw e;
+	    } finally {
+	        close(connection);
+	    }
+	}
+
 	public void update(User user) {
 
 		log.info(new Object() {

@@ -59,13 +59,25 @@ public class SignUpServlet extends HttpServlet {
 		List<String> errorMessages = new ArrayList<String>();
 
 		User user = getUser(request);
-		if (!isValid(user, errorMessages)) {
-			request.setAttribute("errorMessages", errorMessages);
-			request.getRequestDispatcher("signup.jsp").forward(request, response);
-			return;
+		// 実践問題③ -----
+		// 例外(アカウント名の重複)があった場合はエラーメッセージを返す
+		try {
+			String account = user.getAccount();
+			new UserService().select(account);
+
+			if (!isValid(user, errorMessages)) {
+				request.setAttribute("errorMessages", errorMessages);
+				request.getRequestDispatcher("signup.jsp").forward(request, response);
+				return;
+			}
+			new UserService().insert(user);
+			response.sendRedirect("./");
+		} catch (IllegalStateException e) {
+			request.setAttribute("errorMessages", e.getMessage());
+		    request.setAttribute("user", user);
+		    request.getRequestDispatcher("signup.jsp").forward(request, response);
+		    return;
 		}
-		new UserService().insert(user);
-		response.sendRedirect("./");
 	}
 
 	private User getUser(HttpServletRequest request) throws IOException, ServletException {

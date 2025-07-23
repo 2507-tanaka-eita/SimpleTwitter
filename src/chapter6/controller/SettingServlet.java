@@ -68,24 +68,36 @@ public class SettingServlet extends HttpServlet {
 		List<String> errorMessages = new ArrayList<String>();
 
 		User user = getUser(request);
-		if (isValid(user, errorMessages)) {
-			try {
-				new UserService().update(user);
-			} catch (NoRowsUpdatedRuntimeException e) {
-				log.warning("他の人によって更新されています。最新のデータを表示しました。データを確認してください。");
-				errorMessages.add("他の人によって更新されています。最新のデータを表示しました。データを確認してください。");
-			}
-		}
+		// 実践問題③ -----
+		// アカウント名の重複チェック
+		String account = user.getAccount();
+		String accountCheck = new UserService().select(account).toString();
 
-		if (errorMessages.size() != 0) {
-			request.setAttribute("errorMessages", errorMessages);
+		if (account.equals(accountCheck)) {
+			request.setAttribute("errorMessages", "アカウント名が重複しています");
 			request.setAttribute("user", user);
 			request.getRequestDispatcher("setting.jsp").forward(request, response);
 			return;
-		}
+		} else {
+			if (isValid(user, errorMessages)) {
+				try {
+					new UserService().update(user);
+				} catch (NoRowsUpdatedRuntimeException e) {
+					log.warning("他の人によって更新されています。最新のデータを表示しました。データを確認してください。");
+					errorMessages.add("他の人によって更新されています。最新のデータを表示しました。データを確認してください。");
+				}
+			}
 
-		session.setAttribute("loginUser", user);
-		response.sendRedirect("./");
+			if (errorMessages.size() != 0) {
+				request.setAttribute("errorMessages", errorMessages);
+				request.setAttribute("user", user);
+				request.getRequestDispatcher("setting.jsp").forward(request, response);
+				return;
+			}
+
+			session.setAttribute("loginUser", user);
+			response.sendRedirect("./");
+		}
 	}
 
 	private User getUser(HttpServletRequest request) throws IOException, ServletException {
