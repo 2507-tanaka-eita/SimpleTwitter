@@ -60,23 +60,15 @@ public class SignUpServlet extends HttpServlet {
 
 		User user = getUser(request);
 		// 実践問題③ -----
-		// アカウント名の重複チェック　＊自身のアカウント名との重複は無視するようにid判定も追加
-		String account = user.getAccount();
-		User accountCheck = new UserService().select(account);
-		if (accountCheck != null && accountCheck.getId() != user.getId()) {
-			request.setAttribute("errorMessages", "すでに存在するアカウントです");
-			request.setAttribute("user", user);
+		// アカウント名の重複チェック
+		if (!isValid(user, errorMessages)) {
+			request.setAttribute("errorMessages", errorMessages);
 			request.getRequestDispatcher("signup.jsp").forward(request, response);
 			return;
-		} else {
-			if (!isValid(user, errorMessages)) {
-				request.setAttribute("errorMessages", errorMessages);
-				request.getRequestDispatcher("signup.jsp").forward(request, response);
-				return;
-			}
-			new UserService().insert(user);
-			response.sendRedirect("./");
 		}
+		new UserService().insert(user);
+		response.sendRedirect("./");
+
 	}
 
 	private User getUser(HttpServletRequest request) throws IOException, ServletException {
@@ -106,6 +98,7 @@ public class SignUpServlet extends HttpServlet {
 		String account = user.getAccount();
 		String password = user.getPassword();
 		String email = user.getEmail();
+		User accountCheck = new UserService().select(account);
 
 		if (!StringUtils.isEmpty(name) && (20 < name.length())) {
 			errorMessages.add("名前は20文字以下で入力してください");
@@ -115,6 +108,10 @@ public class SignUpServlet extends HttpServlet {
 			errorMessages.add("アカウント名を入力してください");
 		} else if (20 < account.length()) {
 			errorMessages.add("アカウント名は20文字以下で入力してください");
+		}
+
+		if (accountCheck != null) {
+			errorMessages.add("すでに存在するアカウントです");
 		}
 
 		if (StringUtils.isEmpty(password)) {

@@ -67,11 +67,14 @@
 					<div class="account-name">
 						<%-- 実践問題② ----- --%>
 						<%-- アカウント名で投稿を絞り込むためにaタグ追加、パラメータにuserId付けてリクエスト --%>
-						<span class="account"> <a
-							href="./?user_id=<c:out value="${message.userId}"/> "> <c:out
-									value="${message.account}" />
-						</a>
-						</span> <span class="name"><c:out value="${message.name}" /></span>
+						<span class="account">
+							<a href="./?user_id=<c:out value="${message.userId}"/> ">
+								<c:out value="${message.account}" />
+							</a>
+						</span>
+						<span class="name">
+							<c:out value="${message.name}" />
+						</span>
 					</div>
 					<div class="text">
 						<c:out value="${message.text}" />

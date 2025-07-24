@@ -70,33 +70,25 @@ public class SettingServlet extends HttpServlet {
 		User user = getUser(request);
 		// 実践問題③ -----
 		// アカウント名の重複チェック　＊自身のアカウント名との重複は無視するようにid判定も追加
-		String account = user.getAccount();
-		User accountCheck = new UserService().select(account);
-		if (accountCheck != null && accountCheck.getId() != user.getId()) {
-			request.setAttribute("errorMessages", "すでに存在するアカウントです");
+		if (isValid(user, errorMessages)) {
+			try {
+				new UserService().update(user);
+			} catch (NoRowsUpdatedRuntimeException e) {
+				log.warning("他の人によって更新されています。最新のデータを表示しました。データを確認してください。");
+				errorMessages.add("他の人によって更新されています。最新のデータを表示しました。データを確認してください。");
+			}
+		}
+
+		if (errorMessages.size() != 0) {
+			request.setAttribute("errorMessages", errorMessages);
 			request.setAttribute("user", user);
 			request.getRequestDispatcher("setting.jsp").forward(request, response);
 			return;
-		} else {
-			if (isValid(user, errorMessages)) {
-				try {
-					new UserService().update(user);
-				} catch (NoRowsUpdatedRuntimeException e) {
-					log.warning("他の人によって更新されています。最新のデータを表示しました。データを確認してください。");
-					errorMessages.add("他の人によって更新されています。最新のデータを表示しました。データを確認してください。");
-				}
-			}
-
-			if (errorMessages.size() != 0) {
-				request.setAttribute("errorMessages", errorMessages);
-				request.setAttribute("user", user);
-				request.getRequestDispatcher("setting.jsp").forward(request, response);
-				return;
-			}
-
-			session.setAttribute("loginUser", user);
-			response.sendRedirect("./");
 		}
+
+		session.setAttribute("loginUser", user);
+		response.sendRedirect("./");
+
 	}
 
 	private User getUser(HttpServletRequest request) throws IOException, ServletException {
@@ -126,6 +118,7 @@ public class SettingServlet extends HttpServlet {
 		String name = user.getName();
 		String account = user.getAccount();
 		String email = user.getEmail();
+		User accountCheck = new UserService().select(account);
 
 		// 実践課題① -----
 		// バリデーションの設定見直し　＊Password空白でも通るように
@@ -136,6 +129,9 @@ public class SettingServlet extends HttpServlet {
 			errorMessages.add("アカウント名を入力してください");
 		} else if (20 < account.length()) {
 			errorMessages.add("アカウント名は20文字以下で入力してください");
+		}
+		if (accountCheck != null && accountCheck.getId() != user.getId()) {
+			errorMessages.add("すでに存在するアカウントです");
 		}
 		if (!StringUtils.isEmpty(email) && (50 < email.length())) {
 			errorMessages.add("メールアドレスは50文字以下で入力してください");
