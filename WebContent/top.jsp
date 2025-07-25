@@ -84,6 +84,16 @@
 						<fmt:formatDate value="${message.createdDate}"
 							pattern="yyyy/MM/dd HH:mm:ss" />
 					</div>
+					<%-- つぶやきの編集 ----- --%>
+					<c:if test="${loginUser.id == message.userId}">
+						<div class="edit">
+							<form action="edit" method="get">
+								<input type="hidden" name="messageId" value="${message.id}">
+								<input type="submit" value="編集">
+							</form>
+						</div>
+					</c:if>
+					<%-- つぶやきの削除 ----- --%>
 					<c:if test="${loginUser.id == message.userId}">
 						<div class="delete">
 							<form action="deleteMessage" method="post">
