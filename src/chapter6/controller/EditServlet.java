@@ -47,7 +47,7 @@ public class EditServlet extends HttpServlet {
 				}.getClass().getEnclosingMethod().getName());
 
 		String messageId = request.getParameter("messageId");
-		List<Message> messages = new MessageService().selectEdit(messageId);
+		Message messages = new MessageService().selectEdit(messageId);
 
 		HttpSession session = request.getSession();
 		List<String> errorMessages = new ArrayList<String>();
@@ -75,16 +75,21 @@ public class EditServlet extends HttpServlet {
 				}.getClass().getEnclosingMethod().getName());
 
 		String messageId = request.getParameter("messageId");
+		int messageIntId = Integer.parseInt(messageId);
 		String messageText = request.getParameter("text");
+		Message messages = new Message();
+		messages.setId(messageIntId);
+		messages.setText(messageText);
 
-//		HttpSession session = request.getSession();
-//		List<String> errorMessages = new ArrayList<String>();
+		HttpSession session = request.getSession();
+		List<String> errorMessages = new ArrayList<String>();
 
-//		if (!isValid(messageText, errorMessages)) {
-//			session.setAttribute("errorMessages", errorMessages);
-//			request.getRequestDispatcher("edit.jsp").forward(request, response);
-//			return;
-//		}
+		if (!isValidMessage(messageText, errorMessages)) {
+			session.setAttribute("errorMessages", errorMessages);
+			session.setAttribute("messages", messages);
+			request.getRequestDispatcher("edit.jsp").forward(request, response);
+			return;
+		}
 
 		new MessageService().update(messageId, messageText);
 
@@ -101,7 +106,7 @@ public class EditServlet extends HttpServlet {
 				" : " + new Object() {
 				}.getClass().getEnclosingMethod().getName());
 
-		List<Message> messages = new MessageService().selectEdit(messageId);
+		Message messages = new MessageService().selectEdit(messageId);
 
 		if ((!messageId.matches("^[0-9]+$")) | messages == null | StringUtils.isBlank(messageId)) {
 			errorMessages.add("不正なパラメータが入力されました");
@@ -113,22 +118,23 @@ public class EditServlet extends HttpServlet {
 		return true;
 	}
 
-//	private boolean isValid(String text, List<String> errorMessages) {
-//
-//		log.info(new Object() {
-//		}.getClass().getEnclosingClass().getName() +
-//				" : " + new Object() {
-//				}.getClass().getEnclosingMethod().getName());
-//
-//		if (StringUtils.isBlank(text)) {
-//			errorMessages.add("メッセージを入力してください");
-//		} else if (140 < text.length()) {
-//			errorMessages.add("140文字以下で入力してください");
-//		}
-//
-//		if (errorMessages.size() != 0) {
-//			return false;
-//		}
-//		return true;
-//	}
+	// つぶやき編集時のテキスト入力に関するバリデーション
+	private boolean isValidMessage(String text, List<String> errorMessages) {
+
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
+
+		if (StringUtils.isBlank(text)) {
+			errorMessages.add("メッセージを入力してください");
+		} else if (140 < text.length()) {
+			errorMessages.add("140文字以下で入力してください");
+		}
+
+		if (errorMessages.size() != 0) {
+			return false;
+		}
+		return true;
+	}
 }

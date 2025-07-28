@@ -61,7 +61,7 @@ public class MessageService {
 	}
 
 	// つぶやき編集画面の表示
-	public List<Message> selectEdit(String messageId) {
+	public Message selectEdit(String messageId) {
 
 		log.info(new Object() {
 		}.getClass().getEnclosingClass().getName() +
@@ -71,10 +71,10 @@ public class MessageService {
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			List<Message> messages = new MessageDao().select(connection, messageId);
+			Message message = new MessageDao().select(connection, messageId);
 			commit(connection);
 
-			return messages;
+			return message;
 		} catch (RuntimeException e) {
 			rollback(connection);
 			log.log(Level.SEVERE, new Object() {

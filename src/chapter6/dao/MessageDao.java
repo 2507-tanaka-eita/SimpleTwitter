@@ -6,13 +6,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import chapter6.beans.Message;
-import chapter6.beans.User;
 import chapter6.exception.NoRowsUpdatedRuntimeException;
 import chapter6.exception.SQLRuntimeException;
 import chapter6.logging.InitApplication;
@@ -72,7 +69,7 @@ public class MessageDao {
 	}
 
 	// つぶやき編集画面の表示
-	public List<Message> select(Connection connection, String messageId) {
+	public Message select(Connection connection, String messageId) {
 
 		log.info(new Object() {
 		}.getClass().getEnclosingClass().getName() +
@@ -87,12 +84,15 @@ public class MessageDao {
 			ps.setString(1, messageId);
 
 			ResultSet rs = ps.executeQuery();
-			List<Message> messages = toMessages(rs);
-			if (messages.isEmpty()) {
-				return null;
-			} else {
-				return messages;
-			}
+
+			if (rs.next()) {
+		        Message messages = new Message();
+		        messages.setId(rs.getInt("id"));
+		        messages.setText(rs.getString("text"));
+		        return messages;
+		    } else {
+		        return null;
+		    }
 
 		} catch (SQLException e) {
 			log.log(Level.SEVERE, new Object() {
@@ -161,31 +161,6 @@ public class MessageDao {
 			throw new SQLRuntimeException(e);
 		} finally {
 			close(ps);
-		}
-	}
-
-	private List<Message> toMessages(ResultSet rs) throws SQLException {
-
-		log.info(new Object() {
-		}.getClass().getEnclosingClass().getName() +
-				" : " + new Object() {
-				}.getClass().getEnclosingMethod().getName());
-
-		List<Message> messages = new ArrayList<Message>();
-		try {
-			while (rs.next()) {
-				Message message = new Message();
-				message.setId(rs.getInt("id"));
-				message.setUserId(rs.getInt("user_id"));
-				message.setText(rs.getString("text"));
-				message.setCreatedDate(rs.getTimestamp("created_date"));
-				message.setUpdatedDate(rs.getTimestamp("updated_date"));
-
-				messages.add(message);
-			}
-			return messages;
-		} finally {
-			close(rs);
 		}
 	}
 }

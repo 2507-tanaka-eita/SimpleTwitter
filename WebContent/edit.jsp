@@ -51,16 +51,16 @@
 			<c:remove var="errorMessages" scope="session" />
 		</c:if>
 
-		<c:forEach var="message" items="${messages}">
+		<%-- <c:forEach var="message" items="${messages}"> --%>
 			<div class="form-area">
 				<form action="edit" method="post">
-					<textarea name="text" cols="100" rows="5" class="tweet-box">${message.text}</textarea>
+					<textarea name="text" cols="100" rows="5" class="tweet-box">${messages.text}</textarea>
 					<br />
-					<input type="hidden" name="messageId" value="${message.id}">
+					<input type="hidden" name="messageId" value="${messages.id}">
 					<input type="submit" value="更新">（140文字まで）
 				</form>
 			</div>
-		</c:forEach>
+		<%-- </c:forEach>--%>
 
 		<div class="copyright">Copyright(c)EitaTanaka</div>
 	</div>
