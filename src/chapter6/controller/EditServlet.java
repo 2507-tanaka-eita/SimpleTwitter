@@ -46,15 +46,27 @@ public class EditServlet extends HttpServlet {
 				" : " + new Object() {
 				}.getClass().getEnclosingMethod().getName());
 
-		String messageId = request.getParameter("messageId");
-		Message messages = new MessageService().selectEdit(messageId);
+		String messageIdStr = request.getParameter("messageId");
 
 		HttpSession session = request.getSession();
 		List<String> errorMessages = new ArrayList<String>();
 
-		if (isValidPram(messageId, errorMessages)) {
-			session.setAttribute("messages", messages);
-			request.getRequestDispatcher("edit.jsp").forward(request, response);
+
+		// つぶやき編集画面でのURLパラメータに関するバリデーション
+		//   1) IDを削除 or 数字以外に変更
+		//   2) 存在しないつぶやきIDに変更
+		if ((StringUtils.isNotBlank(messageIdStr) && messageIdStr.matches("^[0-9]+$"))) {
+			int messageId =  Integer.parseInt(messageIdStr);
+			Message messages = new MessageService().selectEdit(messageId);
+
+			if (messages != null) {
+				request.setAttribute("messages", messages);
+				request.getRequestDispatcher("edit.jsp").forward(request, response);
+			} else {
+				errorMessages.add("不正なパラメータが入力されました");
+			}
+		} else {
+			errorMessages.add("不正なパラメータが入力されました");
 		}
 
 		if (errorMessages.size() != 0) {
@@ -81,42 +93,53 @@ public class EditServlet extends HttpServlet {
 		messages.setId(messageIntId);
 		messages.setText(messageText);
 
-		HttpSession session = request.getSession();
 		List<String> errorMessages = new ArrayList<String>();
 
 		if (!isValidMessage(messageText, errorMessages)) {
-			session.setAttribute("errorMessages", errorMessages);
-			session.setAttribute("messages", messages);
+			request.setAttribute("errorMessages", errorMessages);
+			request.setAttribute("messages", messages);
 			request.getRequestDispatcher("edit.jsp").forward(request, response);
 			return;
 		}
 
-		new MessageService().update(messageId, messageText);
+		new MessageService().update(messages);
 
 		response.sendRedirect("./");
 	}
+
+
+
+	// isValidPram 後から消す
+	// ---------------------------------------
+
 
 	// つぶやき編集画面でのURLパラメータに関するバリデーション
 	// 1) 数字以外に変更：正規表現で数字判定
 	// 2) 存在しないつぶやきIDに変更：MessageService().selectEdit(messageId) の実行結果(戻り値)で判定
 	// 3) IDを削除：isBlankで判定
-	private boolean isValidPram(String messageId, List<String> errorMessages) {
-		log.info(new Object() {
-		}.getClass().getEnclosingClass().getName() +
-				" : " + new Object() {
-				}.getClass().getEnclosingMethod().getName());
+//	private boolean isValidPram(int messageId, List<String> errorMessages) {
+//		log.info(new Object() {
+//		}.getClass().getEnclosingClass().getName() +
+//				" : " + new Object() {
+//				}.getClass().getEnclosingMethod().getName());
+//
+//		Message messages = new MessageService().selectEdit(messageId);
+//		String messageIdStr = Integer.toString(messageId);
+//
+//		if ((!messageIdStr.matches("^[0-9]+$")) | messages == null | StringUtils.isBlank(messageIdStr)) {
+//			errorMessages.add("不正なパラメータが入力されました");
+//		}
+//
+//		if (errorMessages.size() != 0) {
+//			return false;
+//		}
+//		return true;
+//	}
 
-		Message messages = new MessageService().selectEdit(messageId);
+	// ---------------------------------------
 
-		if ((!messageId.matches("^[0-9]+$")) | messages == null | StringUtils.isBlank(messageId)) {
-			errorMessages.add("不正なパラメータが入力されました");
-		}
 
-		if (errorMessages.size() != 0) {
-			return false;
-		}
-		return true;
-	}
+
 
 	// つぶやき編集時のテキスト入力に関するバリデーション
 	private boolean isValidMessage(String text, List<String> errorMessages) {

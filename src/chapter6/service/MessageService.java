@@ -61,7 +61,7 @@ public class MessageService {
 	}
 
 	// つぶやき編集画面の表示
-	public Message selectEdit(String messageId) {
+	public Message selectEdit(int messageId) {
 
 		log.info(new Object() {
 		}.getClass().getEnclosingClass().getName() +
@@ -91,7 +91,7 @@ public class MessageService {
 	}
 
 	// つぶやきの編集
-	public void update(String messageId, String messageText) {
+	public void update(Message messages) {
 
 		log.info(new Object() {
 		}.getClass().getEnclosingClass().getName() +
@@ -101,7 +101,7 @@ public class MessageService {
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			new MessageDao().update(connection, messageId, messageText);
+			new MessageDao().update(connection, messages);
 			commit(connection);
 
 		} catch (RuntimeException e) {
@@ -120,7 +120,7 @@ public class MessageService {
 	}
 
 	// つぶやきの削除
-	public void delete(String messageId) {
+	public void delete(int messageId) {
 
 		log.info(new Object() {
 		}.getClass().getEnclosingClass().getName() +
