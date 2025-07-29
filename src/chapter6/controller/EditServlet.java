@@ -33,7 +33,6 @@ public class EditServlet extends HttpServlet {
 	public EditServlet() {
 		InitApplication application = InitApplication.getInstance();
 		application.init();
-
 	}
 
 	// つぶやき編集画面の表示
@@ -50,7 +49,6 @@ public class EditServlet extends HttpServlet {
 
 		HttpSession session = request.getSession();
 		List<String> errorMessages = new ArrayList<String>();
-
 
 		// つぶやき編集画面でのURLパラメータに関するバリデーション
 		//   1) IDを削除 or 数字以外に変更
@@ -106,39 +104,6 @@ public class EditServlet extends HttpServlet {
 
 		response.sendRedirect("./");
 	}
-
-
-
-	// isValidPram 後から消す
-	// ---------------------------------------
-
-
-	// つぶやき編集画面でのURLパラメータに関するバリデーション
-	// 1) 数字以外に変更：正規表現で数字判定
-	// 2) 存在しないつぶやきIDに変更：MessageService().selectEdit(messageId) の実行結果(戻り値)で判定
-	// 3) IDを削除：isBlankで判定
-//	private boolean isValidPram(int messageId, List<String> errorMessages) {
-//		log.info(new Object() {
-//		}.getClass().getEnclosingClass().getName() +
-//				" : " + new Object() {
-//				}.getClass().getEnclosingMethod().getName());
-//
-//		Message messages = new MessageService().selectEdit(messageId);
-//		String messageIdStr = Integer.toString(messageId);
-//
-//		if ((!messageIdStr.matches("^[0-9]+$")) | messages == null | StringUtils.isBlank(messageIdStr)) {
-//			errorMessages.add("不正なパラメータが入力されました");
-//		}
-//
-//		if (errorMessages.size() != 0) {
-//			return false;
-//		}
-//		return true;
-//	}
-
-	// ---------------------------------------
-
-
 
 
 	// つぶやき編集時のテキスト入力に関するバリデーション
