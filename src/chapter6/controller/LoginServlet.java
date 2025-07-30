@@ -43,7 +43,7 @@ public class LoginServlet extends HttpServlet {
 				" : " + new Object() {
 				}.getClass().getEnclosingMethod().getName());
 
-		request.getRequestDispatcher("login.jsp").forward(request, response);
+		request.getRequestDispatcher("/login.jsp").forward(request, response);
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class LoginServlet extends HttpServlet {
 			List<String> errorMessages = new ArrayList<String>();
 			errorMessages.add("ログインに失敗しました");
 			request.setAttribute("errorMessages", errorMessages);
-			request.getRequestDispatcher("login.jsp").forward(request, response);
+			request.getRequestDispatcher("/login.jsp").forward(request, response);
 			return;
 		}
 

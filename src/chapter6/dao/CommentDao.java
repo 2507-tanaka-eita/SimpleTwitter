@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import chapter6.beans.Message;
+import chapter6.beans.Comment;
 import chapter6.exception.SQLRuntimeException;
 import chapter6.logging.InitApplication;
 
@@ -29,7 +29,7 @@ public class CommentDao {
 	}
 
 	// つぶやきの返信
-	public void insert(Connection connection, Message messages) {
+	public void insert(Connection connection, Comment comments) {
 
 		log.info(new Object() {
 		}.getClass().getEnclosingClass().getName() +
@@ -56,9 +56,9 @@ public class CommentDao {
 
 			ps = connection.prepareStatement(sql.toString());
 
-			ps.setString(1, messages.getText());
-			ps.setInt(2, messages.getUserId());
-			ps.setInt(3, messages.getId());
+			ps.setString(1, comments.getText());
+			ps.setInt(2, comments.getUserId());
+			ps.setInt(3, comments.getMessageId());
 
 			ps.executeUpdate();
 

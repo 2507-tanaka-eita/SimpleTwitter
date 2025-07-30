@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 
-import chapter6.beans.Message;
+import chapter6.beans.Comment;
 import chapter6.beans.User;
 import chapter6.logging.InitApplication;
 import chapter6.service.CommentService;
@@ -57,16 +57,15 @@ public class CommentServlet extends HttpServlet {
 			return;
 		}
 
-		Message messages = new Message();
-		messages.setId(messageId);
-		messages.setText(comment);
+		Comment comments = new Comment();
+		comments.setMessageId(messageId);
+		comments.setText(comment);
 
 		User user = (User) session.getAttribute("loginUser");
-		messages.setUserId(user.getId());
+		comments.setUserId(user.getId());
 
-		new CommentService().insert(messages);
+		new CommentService().insert(comments);
 		response.sendRedirect("./");
-
 	}
 
 	// つぶやき返信時のテキスト入力に関するバリデーション

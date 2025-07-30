@@ -151,6 +151,7 @@ public class MessageService {
 	 * 実践問題② -----
 	 * selectの引数にString型のuserIdを追加
 	 */
+	// メッセージ一覧の取得
 	public List<UserMessage> select(String userId) {
 
 		log.info(new Object() {

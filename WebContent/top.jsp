@@ -104,6 +104,24 @@
 
 				<%-- つぶやきの返信 ----- --%>
 				<div class="comment">
+					<c:forEach items="${comments}" var="comment">
+						<c:if test="${message.id == comment.messageId}">
+							<div class="account-name">
+								<span class="account">
+									<c:out value="${comment.account}" />
+								</span>
+								<span class="name">
+									<c:out value="${comment.name}" />
+								</span>
+							</div>
+							<div class="text" style="white-space: pre-wrap;"><c:out value="${comment.text}" /></div>
+							<div class="date">
+								<fmt:formatDate value="${comment.createdDate}"
+									pattern="yyyy/MM/dd HH:mm:ss" />
+							</div>
+						</c:if>
+					</c:forEach>
+
 					<div class="form-area">
 						<c:if test="${ isShowMessageForm }">
 							<form action="comment" method="post">
