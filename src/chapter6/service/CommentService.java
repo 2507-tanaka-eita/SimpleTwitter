@@ -69,11 +69,13 @@ public class CommentService {
 				" : " + new Object() {
 				}.getClass().getEnclosingMethod().getName());
 
+		final int LIMIT_NUM = 1000;
+
 		Connection connection = null;
 		try {
 			connection = getConnection();
 
-			List<UserComment> comments = new UserCommentDao().select(connection);
+			List<UserComment> comments = new UserCommentDao().select(connection, LIMIT_NUM);
 			commit(connection);
 
 			return comments;
