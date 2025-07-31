@@ -4,6 +4,8 @@ import static chapter6.utils.CloseableUtil.*;
 import static chapter6.utils.DBUtil.*;
 
 import java.sql.Connection;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -152,7 +154,7 @@ public class MessageService {
 	 * selectの引数にString型のuserIdを追加
 	 */
 	// メッセージ一覧の取得
-	public List<UserMessage> select(String userId) {
+	public List<UserMessage> select(String userId, String startDate, String endDate) {
 
 		log.info(new Object() {
 		}.getClass().getEnclosingClass().getName() +
@@ -167,6 +169,7 @@ public class MessageService {
 
 			/*
 			* 実践問題② -----
+			* userIdに応じてつぶやきを絞り込み
 			* idをnullで初期化
 			* ServletからuserIdの値が渡ってきていたら
 			* 整数型に型変換し、idに代入
@@ -176,25 +179,41 @@ public class MessageService {
 				id = Integer.parseInt(userId);
 			}
 
-			/*
-			* UserMessageDao.selectに引数としてInteger型のidを追加
-			* idがnullだったら全件取得する
-			* idがnull以外だったら、その値に対応するユーザーIDの投稿を取得する
-			*/
-			List<UserMessage> messages = new UserMessageDao().select(connection, id, LIMIT_NUM);
+			// 開始日時～終了日時でつぶやきを絞り込み
+			String startDateFilter;
+			String endDateFilter;
+
+			if (startDate != null && !startDate.isEmpty()) {
+				startDateFilter = startDate + " 00:00:00";
+			} else {
+				startDateFilter = "2020-01-01 00:00:00";
+			}
+
+			if (endDate != null && !endDate.isEmpty()) {
+				endDateFilter = endDate + " 23:59:59";
+			} else {
+				Date nowDate = new Date();
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				endDateFilter = sdf.format(nowDate);
+			}
+
+			List<UserMessage> messages = new UserMessageDao().select(connection, id, LIMIT_NUM, startDateFilter, endDateFilter);
 			commit(connection);
 
 			return messages;
+
 		} catch (RuntimeException e) {
 			rollback(connection);
 			log.log(Level.SEVERE, new Object() {
 			}.getClass().getEnclosingClass().getName() + " : " + e.toString(), e);
 			throw e;
+
 		} catch (Error e) {
 			rollback(connection);
 			log.log(Level.SEVERE, new Object() {
 			}.getClass().getEnclosingClass().getName() + " : " + e.toString(), e);
 			throw e;
+
 		} finally {
 			close(connection);
 		}

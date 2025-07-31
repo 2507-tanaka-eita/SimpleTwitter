@@ -33,7 +33,7 @@ public class UserMessageDao {
 	}
 
 	// 引数に"id"を追加。nullが扱えるようにラッパークラス(Integer)で型指定。
-	public List<UserMessage> select(Connection connection, Integer id, int num) {
+	public List<UserMessage> select(Connection connection, Integer id, int num, String startDateFilter, String endDateFilter) {
 
 		log.info(new Object() {
 		}.getClass().getEnclosingClass().getName() +
@@ -60,22 +60,29 @@ public class UserMessageDao {
 			sql.append("ON messages.user_id = users.id ");
 			if (id != null) {
 				sql.append("WHERE messages.user_id = ? ");
+			} else {
+				sql.append("WHERE messages.created_date BETWEEN ? AND ? ");
 			}
 			sql.append("ORDER BY created_date DESC limit " + num);
 
 			ps = connection.prepareStatement(sql.toString());
 			if (id != null) {
 				ps.setInt(1, id);
+			} else {
+				ps.setString(1, startDateFilter);
+				ps.setString(2, endDateFilter);
 			}
 
 			ResultSet rs = ps.executeQuery();
 
 			List<UserMessage> messages = toUserMessages(rs);
 			return messages;
+
 		} catch (SQLException e) {
 			log.log(Level.SEVERE, new Object() {
 			}.getClass().getEnclosingClass().getName() + " : " + e.toString(), e);
 			throw new SQLRuntimeException(e);
+
 		} finally {
 			close(ps);
 		}

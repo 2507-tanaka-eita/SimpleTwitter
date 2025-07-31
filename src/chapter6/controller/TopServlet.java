@@ -60,7 +60,9 @@ public class TopServlet extends HttpServlet {
 		// 引数：userId＝アカウントでメッセージを絞り込む用
 		// 引数：start, end＝日付でメッセージを絞り込む用
 		String userId = request.getParameter("user_id");
-		List<UserMessage> messages = new MessageService().select(userId);
+		String startDate = request.getParameter("startDate");
+		String endDate = request.getParameter("endDate");
+		List<UserMessage> messages = new MessageService().select(userId, startDate, endDate);
 
 		// つぶやき返信の表示
 		List<UserComment> comments= new CommentService().select();

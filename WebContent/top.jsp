@@ -38,6 +38,16 @@
 					</div>
 				</div>
 			</c:if>
+
+			<div class="filterDate">
+				<form action="./" method="get">
+					日付：
+					<%-- type="date"のエラーはeclipseの機能上の問題の為、実装においては問題なし --%>
+					<input type="date" name="startDate" value="${param.startDate}">
+					<input type="date" name="endDate" value="${param.endDate}">
+					<input type="submit" value="絞り込み">
+				</form>
+			</div>
 		</div>
 
 		<c:if test="${ not empty errorMessages }">
@@ -64,7 +74,7 @@
 
 		<div class="messages">
 			<c:forEach items="${messages}" var="message">
-				<div class="message">
+				<div class="message" style="margin-bottom: 10px;">
 					<div class="account-name">
 						<%-- 実践問題② ----- --%>
 						<%-- アカウント名で投稿を絞り込むためにaタグ追加、パラメータにuserId付けてリクエスト --%>
@@ -82,28 +92,41 @@
 						<fmt:formatDate value="${message.createdDate}"
 							pattern="yyyy/MM/dd HH:mm:ss" />
 					</div>
-					<%-- つぶやきの編集 ----- --%>
-					<c:if test="${loginUser.id == message.userId}">
-						<div class="edit">
-							<form action="edit" method="get">
-								<input type="hidden" name="messageId" value="${message.id}">
-								<input type="submit" value="編集">
-							</form>
-						</div>
-					</c:if>
-					<%-- つぶやきの削除 ----- --%>
-					<c:if test="${loginUser.id == message.userId}">
-						<div class="delete">
-							<form action="deleteMessage" method="post">
-								<input type="hidden" name="messageId" value="${message.id}">
-								<input type="submit" value="削除">
-							</form>
-						</div>
-					</c:if>
+					<div class="btnWrap" style="display: flex;">
+						<%-- つぶやきの編集 ----- --%>
+						<c:if test="${loginUser.id == message.userId}">
+							<div class="edit">
+								<form action="edit" method="get">
+									<input type="hidden" name="messageId" value="${message.id}">
+									<input type="submit" value="編集">
+								</form>
+							</div>
+						</c:if>
+						<%-- つぶやきの削除 ----- --%>
+						<c:if test="${loginUser.id == message.userId}">
+							<div class="delete" style="margin-left: 5px;">
+								<form action="deleteMessage" method="post">
+									<input type="hidden" name="messageId" value="${message.id}">
+									<input type="submit" value="削除">
+								</form>
+							</div>
+						</c:if>
+					</div>
 				</div>
 
 				<%-- つぶやきの返信 ----- --%>
-				<div class="comment">
+				<div class="comment" style="margin-bottom: 20px;">
+					<div class="form-area">
+						<c:if test="${ isShowMessageForm }">
+							<form action="comment" method="post">
+								<textarea name="comment" cols="100" rows="5" class="tweet-box"></textarea>
+								<br />
+								<input type="hidden" name="messageId" value="${message.id}">
+								<input type="submit" value="返信">（140文字まで）
+							</form>
+						</c:if>
+					</div>
+
 					<c:forEach items="${comments}" var="comment">
 						<c:if test="${message.id == comment.messageId}">
 							<div class="account-name">
@@ -115,23 +138,12 @@
 								</span>
 							</div>
 							<div class="text" style="white-space: pre-wrap;"><c:out value="${comment.text}" /></div>
-							<div class="date">
+							<div class="date" style="margin-bottom: 5px;">
 								<fmt:formatDate value="${comment.createdDate}"
 									pattern="yyyy/MM/dd HH:mm:ss" />
 							</div>
 						</c:if>
 					</c:forEach>
-
-					<div class="form-area">
-						<c:if test="${ isShowMessageForm }">
-							<form action="comment" method="post">
-								<textarea name="comment" cols="100" rows="5" class="tweet-box"></textarea>
-								<br />
-								<input type="hidden" name="messageId" value="${message.id}">
-								<input type="submit" value="返信">（140文字まで）
-							</form>
-						</c:if>
-					</div>
 				</div>
 			</c:forEach>
 		</div>
